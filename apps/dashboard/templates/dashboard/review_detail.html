@@ -1,0 +1,15 @@
+{% extends 'dashboard/base.html' %}
+{% block content %}
+<h2>리뷰 {{ r.id }}</h2>
+    <p><strong>원문</strong></p>
+    <p>{{ r.original_text }}</p>
+
+    <p><strong>요약</strong></p>
+    <p>{{ r.summary }}</p>
+
+    <p><strong>감성</strong> {{ r.sentiment }}</p>
+    <p><strong>키워드</strong> {{ r.keywords }}</p>
+    <p><strong>인사이트</strong> {{ r.insights }}</p>
+
+<a href="{% url 'dashboard:reviews' %}">목록으로</a>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends 'dashboard/base.html' %}
+    {% block title %}대시보드 홈{% endblock %}
+        {% block content %}
+            <h2>Dashboard Overview</h2>
+                <div class="stats-grid">
+                    {% include 'dashboard/components/stats_card.html' with title='총 리뷰 수' value=125 %}
+                    {% include 'dashboard/components/stats_card.html' with title='생성된 리뷰' value=38 %}
+                    {% include 'dashboard/components/stats_card.html' with title='모델 버전' value='A-1.0' %}
+                </div>
+{% endblock %}

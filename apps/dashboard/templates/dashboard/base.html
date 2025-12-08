@@ -1,0 +1,23 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Dashboard{% endblock %}</title>
+<link rel="stylesheet" href="{% static 'dashboard/css/styles.css' %}">
+</head>
+<body>
+    <div class="layout">
+    {% include 'dashboard/components/sidebar.html' %}
+
+
+    <main class="content">
+    {% include 'dashboard/components/header.html' %}
+<section>
+{% block content %}{% endblock %}
+</section>
+    </main>
+</div>
+</body>
+</html>

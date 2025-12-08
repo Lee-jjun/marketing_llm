@@ -1,0 +1,22 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}리뷰 생성{% endblock %}
+{% block content %}
+<h2>AI 리뷰 생성</h2>
+<form id="reviewForm" method="post">
+    {% csrf_token %}
+    <label>병원명</label>
+    <input type="text" name="hospital" required>
+
+    <label>시술명</label>
+    <input type="text" name="service" required>
+
+    <label>톤 (예: 친절, 자세함 등)</label>
+    <input type="text" name="tone" required>
+
+    <button type="submit" class="btn-primary">리뷰 생성</button>
+</form>
+
+<div id="resultBox" class="result-box" style="display:none;"></div>
+
+<script src="/static/dashboard/js/dashboard.js"></script>
+{% endblock %}
