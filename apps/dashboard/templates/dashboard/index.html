@@ -1,10 +1,32 @@
 {% extends 'dashboard/base.html' %}
-    {% block title %}대시보드 홈{% endblock %}
-        {% block content %}
-            <h2>Dashboard Overview</h2>
-                <div class="stats-grid">
-                    {% include 'dashboard/components/stats_card.html' with title='총 리뷰 수' value=125 %}
-                    {% include 'dashboard/components/stats_card.html' with title='생성된 리뷰' value=38 %}
-                    {% include 'dashboard/components/stats_card.html' with title='모델 버전' value='A-1.0' %}
-                </div>
+{% block title %}대시보드 · 홈{% endblock %}
+{% block header_title %}오버뷰{% endblock %}
+{% block content %}
+<div class="stats-grid">
+  <div class="card">
+    <div class="kpi-value">{{ total_reviews }}</div>
+    <div class="kpi-label">총 리뷰 수</div>
+  </div>
+  <div class="card">
+    <div class="kpi-value">{{ generated_reviews }}</div>
+    <div class="kpi-label">AI 생성 리뷰</div>
+  </div>
+  <div class="card">
+    <div class="kpi-value">{{ model_version }}</div>
+    <div class="kpi-label">모델 버전</div>
+  </div>
+</div>
+
+<div class="card">
+  <h3>최근 캠페인</h3>
+  <div class="meta" style="margin-top:10px;">
+    {% for c in campaigns %}
+      <div style="margin-bottom:8px;">
+        <strong>{{ c.name }}</strong> <span class="row-muted"> / 시작: {{ c.start_date }}</span>
+      </div>
+    {% empty %}
+      <div class="row-muted">등록된 캠페인이 없습니다.</div>
+    {% endfor %}
+  </div>
+</div>
 {% endblock %}

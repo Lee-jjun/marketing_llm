@@ -2,22 +2,40 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{% block title %}Dashboard{% endblock %}</title>
-<link rel="stylesheet" href="{% static 'dashboard/css/styles.css' %}">
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>{% block title %}대시보드 · 마케팅LLM{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'dashboard/css/styles.css' %}">
 </head>
 <body>
-    <div class="layout">
-    {% include 'dashboard/components/sidebar.html' %}
-
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="logo">MedViral Admin</div>
+      <nav>
+        <a href="{% url 'dashboard:index' %}">홈</a>
+        <a href="{% url 'dashboard:reviews_list' %}">리뷰 목록</a>
+        <a href="{% url 'dashboard:generate_review' %}">리뷰 생성 (AI)</a>
+        <a href="{% url 'dashboard:image_browser' %}">이미지 탐색</a>
+      </nav>
+      <div class="small">버전 A-1.0 · 내부용</div>
+    </aside>
 
     <main class="content">
-    {% include 'dashboard/components/header.html' %}
-<section>
-{% block content %}{% endblock %}
-</section>
+      <header class="header">
+        <div>
+          <div class="h-title">{% block header_title %}대시보드{% endblock %}</div>
+          <div class="h-sub">{% block header_sub %}병·의원 바이럴 마케팅 관리{% endblock %}</div>
+        </div>
+        <div>
+          <button class="btn-ghost" onclick="location.href='/admin/'">Admin</button>
+          <button class="btn-primary" onclick="location.href='{% url 'dashboard:generate_review' %}'">AI 리뷰 생성</button>
+        </div>
+      </header>
+
+      <section>
+        {% block content %}{% endblock %}
+      </section>
     </main>
-</div>
+  </div>
 </body>
 </html>

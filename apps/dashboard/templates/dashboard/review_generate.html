@@ -1,22 +1,61 @@
 {% extends 'dashboard/base.html' %}
-{% block title %}리뷰 생성{% endblock %}
+{% block title %}AI 리뷰 생성{% endblock %}
+{% block header_title %}AI 리뷰 생성{% endblock %}
 {% block content %}
-<h2>AI 리뷰 생성</h2>
-<form id="reviewForm" method="post">
+<div class="card" style="max-width:880px">
+  <form id="reviewForm" method="post">
     {% csrf_token %}
-    <label>병원명</label>
-    <input type="text" name="hospital" required>
+    <div style="display:flex;gap:12px;margin-bottom:12px;">
+      <input name="hospital" placeholder="병원명 (예: OO피부과)" style="flex:1;padding:12px;border-radius:8px;border:1px solid var(--border)" required>
+      <input name="service" placeholder="시술명 (예: 여드름 치료)" style="flex:1;padding:12px;border-radius:8px;border:1px solid var(--border)" required>
+    </div>
+    <div style="margin-bottom:12px;">
+      <input name="tone" placeholder="톤 (예: 20대 여성 부드러운 톤)" style="width:100%;padding:12px;border-radius:8px;border:1px solid var(--border)">
+    </div>
 
-    <label>시술명</label>
-    <input type="text" name="service" required>
+    <div style="display:flex;gap:12px;align-items:center;">
+      <button class="btn-primary" type="submit">리뷰 생성</button>
+      <button type="button" class="btn-ghost" id="clearBtn">초기화</button>
+    </div>
+  </form>
 
-    <label>톤 (예: 친절, 자세함 등)</label>
-    <input type="text" name="tone" required>
+  <div id="resultBox" class="result-box" style="display:none;margin-top:18px"></div>
+</div>
 
-    <button type="submit" class="btn-primary">리뷰 생성</button>
-</form>
-
-<div id="resultBox" class="result-box" style="display:none;"></div>
-
-<script src="/static/dashboard/js/dashboard.js"></script>
+<script>
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+          }
+      }
+  }
+  return cookieValue;
+}
+document.getElementById('reviewForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const form = e.target;
+  const data = new URLSearchParams(new FormData(form));
+  const csrftoken = getCookie('csrftoken');
+  const res = await fetch("{% url 'dashboard:generate_review' %}",{
+    method:'POST',
+    headers: {'X-CSRFToken': csrftoken},
+    body: data
+  });
+  const json = await res.json();
+  const box = document.getElementById('resultBox');
+  box.style.display='block';
+  if (json.error) {
+    box.innerText = 'Error: ' + (json.error || JSON.stringify(json));
+  } else {
+    box.innerText = json.review;
+  }
+});
+document.getElementById('clearBtn').addEventListener('click', ()=>{ document.getElementById('reviewForm').reset(); document.getElementById('resultBox').style.display='none'; });
+</script>
 {% endblock %}

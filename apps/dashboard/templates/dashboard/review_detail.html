@@ -1,15 +1,22 @@
 {% extends 'dashboard/base.html' %}
+{% block title %}리뷰 상세{% endblock %}
+{% block header_title %}리뷰 상세{% endblock %}
 {% block content %}
-<h2>리뷰 {{ r.id }}</h2>
-    <p><strong>원문</strong></p>
-    <p>{{ r.original_text }}</p>
+<div class="card">
+  <div class="meta">ID: {{ r.id }}  ·  캠페인: {{ r.campaign.name if r.campaign }}</div>
+  <h3 style="margin-top:10px;">원문</h3>
+  <p>{{ r.original_text }}</p>
 
-    <p><strong>요약</strong></p>
-    <p>{{ r.summary }}</p>
+  <h4>요약</h4>
+  <div class="result-box">{{ r.summary|default:"요약 없음" }}</div>
 
-    <p><strong>감성</strong> {{ r.sentiment }}</p>
-    <p><strong>키워드</strong> {{ r.keywords }}</p>
-    <p><strong>인사이트</strong> {{ r.insights }}</p>
+  <h4 style="margin-top:12px;">감성</h4>
+  <div class="tag">{{ r.sentiment|default:"-" }}</div>
 
-<a href="{% url 'dashboard:reviews' %}">목록으로</a>
+  <h4 style="margin-top:12px;">키워드</h4>
+  <div class="meta">{{ r.keywords|join:", " }}</div>
+
+  <h4 style="margin-top:12px;">인사이트</h4>
+  <div class="meta">{{ r.insights|default:"없음" }}</div>
+</div>
 {% endblock %}

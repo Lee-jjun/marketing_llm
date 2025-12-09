@@ -1,21 +1,49 @@
 {% extends 'dashboard/base.html' %}
-    {% block title %}리뷰 목록{% endblock %}
-        {% block content %}
-            <h2>리뷰 목록</h2>
-                <table class="default-table">
-                    <tr>
-                        <th>ID</th>
-                        <th>작성자</th>
-                        <th>내용</th>
-                        <th>생성일</th>
-                        </tr>
-            {% for r in reviews %}
-                        <tr>
-                        <td>{{ r.id }}</td>
-                        <td>{{ r.author }}</td>
-                        <td>{{ r.content }}</td>
-                        <td>{{ r.created_at }}</td>
-                    </tr>
-        {% endfor %}
-            </table>
+{% block title %}리뷰 목록{% endblock %}
+{% block header_title %}리뷰 목록{% endblock %}
+{% block content %}
+<table class="default-table">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>캠페인</th>
+      <th>요약</th>
+      <th>감성</th>
+      <th>생성일</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in reviews %}
+      <tr>
+        <td>
+          <a href="{% url 'dashboard:review_detail' r.id %}">{{ r.id }}</a>
+        </td>
+
+        <td>
+          {% if r.campaign %}
+            {{ r.campaign.name }}
+          {% else %}
+            -
+          {% endif %}
+        </td>
+
+        <td>
+          {{ r.summary|default:r.original_text|truncatechars:80 }}
+        </td>
+
+        <td class="row-muted">
+          {{ r.sentiment|default:"-" }}
+        </td>
+
+        <td class="row-muted">
+          {{ r.created_at }}
+        </td>
+      </tr>
+    {% empty %}
+      <tr>
+        <td colspan="5" class="row-muted">리뷰가 없습니다.</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
 {% endblock %}
