@@ -12,7 +12,7 @@ from notion.client import update_page
 TEST_PAGE_ID = "2cb286f326ff81b89316c04aab611d5e"
 
 # 🔽 테스트 URL
-TEST_URL = "https://cafe.naver.com/feko/9858485"
+TEST_URL = "https://cafe.naver.com/feko/999120"
 
 
 def main():

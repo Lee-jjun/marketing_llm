@@ -22,6 +22,7 @@ from notion.fetch import (
     get_rich_text,
     get_relation_page_ids,
     get_page_title,
+    get_rollup_people_names, 
 )
 
 RATE_LIMIT_SLEEP = 0.3
@@ -66,6 +67,7 @@ def main():
                 title = get_rich_text(page, "글 제목")
                 url = get_url(page, cfg["url"])
 
+                
                 # =========================
                 # 병원 relation → 병원명
                 # =========================
@@ -75,12 +77,17 @@ def main():
                     continue
 
                 hospital_page_id = hospital_ids[0]
-                hospital_page = retrieve_page(hospital_page_id)
+                try:
+                    hospital_page = retrieve_page(hospital_page_id)
+                except Exception as e:
+                    print("⚠️ 병원 페이지 로드 실패 → 스킵:", hospital_page_id, e)
+                    continue
                 hospital_name = get_page_title(hospital_page) or "(병원명 없음)"
-
+                marketers = get_rollup_people_names(page, "작업자")
+                marketer_text = ", ".join(marketers) if marketers else "미지정"
                 print(
                     f"🏥 병원: {hospital_name} | "
-                    f"[{name}] 처리 중 → {page_id}"
+                    f"[{label}] 처리 중 → {page_id}"
                 )
 
                 # =========================
@@ -96,16 +103,16 @@ def main():
                 )
 
                 # =========================
-                # 🔔 알림 추가
+                # 🔔 알림 추가 (담당자 포함)
                 # =========================
                 append_link_block_to_block(
                     callout_id,
                     title=f"[{label}] {title or '(제목 없음)'}",
                     url=url,
-                    time_text=now_text,
+                    time_text=f"{now_text} | 담당: {marketer_text}",
                 )
 
-                print(f"✅ 알림 추가 완료 → {hospital_name}")
+                print(f"✅ 알림 추가 완료 → {hospital_name} (담당: {marketer_text})")
 
                 # =========================
                 # 🧹 NEW 체크 해제

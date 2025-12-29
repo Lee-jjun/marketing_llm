@@ -60,3 +60,47 @@ def is_number_property(page, prop_name: str) -> bool:
 def get_rich_text(page, prop):
     texts = page["properties"][prop]["rich_text"]
     return "".join(t["plain_text"] for t in texts)
+
+from datetime import datetime, timezone
+
+def get_date(page, prop):
+    try:
+        d = page["properties"][prop]["date"]
+        if not d or not d.get("start"):
+            return None
+
+        # '2025-06-26' → datetime(UTC)
+        return datetime.fromisoformat(d["start"]).replace(tzinfo=timezone.utc)
+
+    except Exception:
+        return None
+    
+def get_rollup_people_names(page, prop_name: str) -> list[str]:
+    """
+    Rollup 속성에서 People 이름 목록 추출
+    """
+    try:
+        rollup = page["properties"][prop_name]["rollup"]
+        if rollup["type"] != "array":
+            return []
+
+        names = []
+        for item in rollup["array"]:
+            if item["type"] == "people":
+                for p in item["people"]:
+                    if "name" in p:
+                        names.append(p["name"])
+        return names
+    except Exception:
+        return []
+    
+
+def get_people_ids(page, prop_name: str):
+    """
+    People 속성에서 사용자 ID 리스트 반환
+    """
+    try:
+        people = page["properties"][prop_name]["people"]
+        return [p["id"] for p in people]
+    except Exception:
+        return []
