@@ -21,7 +21,22 @@ try:
 
         print(f"[DB] {name} 페이지 수:", len(pages))
 
-        force = any(get_checkbox(p, cfg["db_refresh_flag"]) for p in pages)
+        # =========================
+        # 🔑 refresh flag 안전 처리
+        # =========================
+        refresh_flag_prop = cfg.get("db_refresh_flag")
+
+        if refresh_flag_prop:
+            try:
+                force = any(
+                    get_checkbox(p, refresh_flag_prop)
+                    for p in pages
+                )
+            except Exception as e:
+                print("⚠️ refresh flag 체크 실패 → force=False", e)
+                force = False
+        else:
+            force = False
 
         for idx, page in enumerate(pages, start=1):
             print(f"[{idx}/{len(pages)}] processing")
@@ -32,14 +47,19 @@ try:
                 traceback.print_exc()
                 continue   # 🔥 절대 멈추지 않음
 
-        # 🔥 여기서 NOTION 실패해도 절대 멈추면 안 됨
-        if force:
+        # =========================
+        # refresh flag 해제 (있는 DB만)
+        # =========================
+        if force and refresh_flag_prop:
             print("🔄 refresh flag 해제 중...")
             for p in pages:
                 try:
-                    update_page(p["id"], {
-                        cfg["db_refresh_flag"]: {"checkbox": False}
-                    })
+                    update_page(
+                        p["id"],
+                        {
+                            refresh_flag_prop: {"checkbox": False}
+                        }
+                    )
                 except Exception as e:
                     print("⚠️ refresh flag 해제 실패:", p["id"], e)
                     continue

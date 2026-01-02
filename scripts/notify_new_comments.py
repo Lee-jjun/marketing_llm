@@ -22,7 +22,7 @@ from notion.fetch import (
     get_rich_text,
     get_relation_page_ids,
     get_page_title,
-    get_rollup_people_names, 
+    get_rollup_people_names,
 )
 
 RATE_LIMIT_SLEEP = 0.3
@@ -40,16 +40,18 @@ def find_callout_block_id(page_id: str) -> str | None:
 
 
 def main():
-    print("🔔 notify_new_comments START")
+    print("🔔 notify_new_comments START (후기 전용)")
 
     total_new = 0
 
-    # ✅ 모든 병원 / 모든 여론·후기 DB 자동 처리
+    # =====================================================
+    # ✅ 후기 DB만 알림 대상
+    # =====================================================
     for name, cfg in NOTION_DBS.items():
-        if "여론" not in name and "후기" not in name:
-            continue
+        if "후기" not in name:
+            continue   # ❌ 여론 완전 제외
 
-        label = "여론" if "여론" in name else "후기"
+        label = "후기"
 
         pages = query_database(cfg["database_id"])
         new_pages = [p for p in pages if get_checkbox(p, cfg["new"])]
@@ -67,9 +69,8 @@ def main():
                 title = get_rich_text(page, "글 제목")
                 url = get_url(page, cfg["url"])
 
-                
                 # =========================
-                # 병원 relation → 병원명
+                # 병원 relation → 병원 페이지
                 # =========================
                 hospital_ids = get_relation_page_ids(page, cfg["hospital_relation"])
                 if not hospital_ids:
@@ -77,17 +78,24 @@ def main():
                     continue
 
                 hospital_page_id = hospital_ids[0]
+
                 try:
                     hospital_page = retrieve_page(hospital_page_id)
                 except Exception as e:
                     print("⚠️ 병원 페이지 로드 실패 → 스킵:", hospital_page_id, e)
                     continue
+
                 hospital_name = get_page_title(hospital_page) or "(병원명 없음)"
+
+                # =========================
+                # 담당자 (롤업)
+                # =========================
                 marketers = get_rollup_people_names(page, "작업자")
                 marketer_text = ", ".join(marketers) if marketers else "미지정"
+
                 print(
                     f"🏥 병원: {hospital_name} | "
-                    f"[{label}] 처리 중 → {page_id}"
+                    f"[후기] 처리 중 → {page_id}"
                 )
 
                 # =========================
@@ -103,11 +111,11 @@ def main():
                 )
 
                 # =========================
-                # 🔔 알림 추가 (담당자 포함)
+                # 🔔 알림 추가
                 # =========================
                 append_link_block_to_block(
                     callout_id,
-                    title=f"[{label}] {title or '(제목 없음)'}",
+                    title=f"[후기] {title or '(제목 없음)'}",
                     url=url,
                     time_text=f"{now_text} | 담당: {marketer_text}",
                 )
